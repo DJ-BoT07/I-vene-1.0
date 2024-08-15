@@ -2,8 +2,7 @@
 import { db } from "@/utils/db";
 import { answersOfUser } from "@/utils/schema";
 import { eq } from "drizzle-orm";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	Collapsible,
 	CollapsibleContent,
@@ -16,6 +15,8 @@ import { useRouter } from "next/navigation";
 function Feedback({ params }) {
     const router = useRouter();
 	const [feedbackList, setFeedbackList] = useState([]);
+	const [averageRating, setAverageRating] = useState(0);
+
 	useEffect(() => {
 		GetFeedback();
 	}, []);
@@ -29,18 +30,26 @@ function Feedback({ params }) {
 
 		console.log(result);
 		setFeedbackList(result);
+
+		// Calculate the average rating
+		const ratings = result.map(item => parseFloat(item.rating)).filter(rating => !isNaN(rating));
+		const total = ratings.reduce((acc, rating) => acc + rating, 0);
+		const average = ratings.length ? total / 5 : 0;
+
+		setAverageRating(average);
 	};
+
 	return (
 		<div className="p-10">
-			<h2 className="text-3xl font-bold text-green-500">Congratulation !</h2>
-			<h2 className="font-bold text-2xl"> Here is you Interview Feedback</h2>
+			<h2 className="text-3xl font-bold text-green-500">Congratulations!</h2>
+			<h2 className="font-bold text-2xl">Here is your Interview Feedback</h2>
 			<h2 className="text-lg my-3 text-blue-600">
-				Your Overall Rating : <strong>7/10</strong>
+				Your Overall Rating : <strong>{Math.round(averageRating * 10) / 10}/10</strong>
 			</h2>
 
 			<h2>
-				Find below interview question with correct answer, Your Answer with
-				Feedback for Improvement
+				Find below interview question with correct answer, your answer with
+				feedback for improvement
 			</h2>
 			{feedbackList &&
 				feedbackList.map((item, index) => (
@@ -59,8 +68,9 @@ function Feedback({ params }) {
 					</Collapsible>
 				))}
                 
-                <Button onClick={()=>router.replace('/dashboard')} className="mt-3">Go Home</Button>
+                <Button onClick={() => router.replace('/dashboard')} className="mt-3">Go Home</Button>
 		</div>
 	);
 }
+
 export default Feedback;
