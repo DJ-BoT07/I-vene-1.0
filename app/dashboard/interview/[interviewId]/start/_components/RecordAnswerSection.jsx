@@ -5,15 +5,26 @@ import web from "./webcam.png";
 import Webcam from "react-webcam";
 import { Button } from "@/components/ui/button";
 import useSpeechToText from "react-hook-speech-to-text";
-import { Mic } from "lucide-react";
+import { StopCircle } from "lucide-react";
+import { toast } from "sonner";
+import { chatSession } from "@/utils/GeminiAIModel";
+import { db } from "@/utils/db";
+import { useUser } from "@clerk/nextjs";
+import moment from "moment";
+import { answersOfUser } from "@/utils/schema";
 
-function RecordAnswerSection() {
+function RecordAnswerSection({
+	mockInterviewQuestion,
+	activeQuestionIndex,
+	interviewData,
+}) {
 	const [userAnswer, setUserAnswer] = useState("");
+	const { user } = useUser();
+	const [loading, setLoading] = useState(false);
 	const {
-		error,
-		interimResult,
 		isRecording,
 		results,
+		setResults,
 		startSpeechToText,
 		stopSpeechToText,
 	} = useSpeechToText({
@@ -22,12 +33,19 @@ function RecordAnswerSection() {
 	});
 
 	useEffect(() => {
-		results.forEach((result) => {
-			setUserAnswer((prevAns) => prevAns + result?.transcript);
-		});
+		if (results.length > 0) {
+			const latestResult = results[results.length - 1]?.transcript;
+			setUserAnswer((prevAns) => prevAns + " " + latestResult);
+		}
 	}, [results]);
 
-	const SaveUserAnswer = () => {
+	useEffect(() => {
+		if (!isRecording && userAnswer.length > 10) {
+			UpdateUserAnswerInDB();
+		}
+	}, [isRecording, userAnswer]);
+
+	const StartStopRecording = async () => {
 		if (isRecording) {
 			stopSpeechToText();
 		} else {
@@ -35,20 +53,85 @@ function RecordAnswerSection() {
 		}
 	};
 
+	const UpdateUserAnswerInDB = async () => {
+		setLoading(true);
+
+		const feedbackPrompt =
+			`Question: ${mockInterviewQuestion[activeQuestionIndex]?.Question},` +
+			`User Answer: ${userAnswer},` +
+			`Depends on Question and user answer for given interview question` +
+			`please give us rating for answer and feedback as area of improvement if any in just 3 to 5 lines to improve it in JSON format with rating field and feedback field`;
+
+		try {
+			const result = await chatSession.sendMessage(feedbackPrompt);
+			let MockJSONResp = await result.response.text();
+
+			console.log("Raw Response:", MockJSONResp);
+
+			MockJSONResp = MockJSONResp.replace("```json", "")
+				.replace("```", "")
+				.trim();
+
+			const jsonEnd = MockJSONResp.lastIndexOf("}") + 1;
+			const validJson = MockJSONResp.substring(0, jsonEnd);
+
+			let parsedResponse;
+			try {
+				parsedResponse = JSON.parse(validJson);
+				console.log("Parsed JSON:", parsedResponse);
+			} catch (parseError) {
+				console.error("Failed to parse JSON:", parseError);
+				toast.error("Failed to parse feedback JSON.");
+				return;
+			}
+
+			console.log("mockIdRef", interviewData.mockId);
+
+			// Ensure `db.insert` is used correctly with the new table name
+			const resp = await db
+			.insert(answersOfUser)
+			.values({
+			  mockIdRef: interviewData.mockId, // Using mockIdRef as defined in schema
+			  question: mockInterviewQuestion[activeQuestionIndex]?.Question,
+			  correctAns: mockInterviewQuestion[activeQuestionIndex]?.Answer,
+			  userAns: userAnswer,
+			  feedback: parsedResponse?.feedback,
+			  rating: parsedResponse?.rating,
+			  userEmail: user.primaryEmailAddress?.emailAddress,
+			  createdAt: moment().format("DD-MM-YYYY"),
+			})
+			.returning({ id: answersOfUser.mockIdRef });
+		  
+
+			console.log("Insert Response:", resp); // Log the response to check success
+
+			if (resp) {
+				toast.success("Answer saved successfully");
+				setUserAnswer("");
+				setResults([]);
+			}
+		} catch (error) {
+			console.error("Failed to process response:", error);
+			toast.error("An error occurred while generating feedback.");
+		} finally {
+			setUserAnswer("");
+			setResults([]);
+			setLoading(false);
+		}
+	};
+
 	const [isWebcamActive, setIsWebcamActive] = useState(false);
 	const [hasWebcamError, setHasWebcamError] = useState(false);
 
 	useEffect(() => {
-		// Try to activate the webcam after a short delay
 		const timer = setTimeout(() => {
 			setIsWebcamActive(true);
-		}, 1000); // Adjust the delay as needed
+		}, 1000);
 
-		return () => clearTimeout(timer); // Clean up the timer on unmount
+		return () => clearTimeout(timer);
 	}, []);
 
 	const handleUserMediaError = () => {
-		// If there's an error accessing the webcam, show the image instead
 		setHasWebcamError(true);
 		setIsWebcamActive(false);
 	};
@@ -73,13 +156,14 @@ function RecordAnswerSection() {
 				)}
 			</div>
 			<Button
+				disabled={loading}
 				variant="outline"
 				className="my-10"
-				onClick={SaveUserAnswer}
+				onClick={StartStopRecording}
 			>
 				{isRecording ? (
 					<h2 className="text-red-700 flex gap-2">
-						<Mic className="mr-2" />
+						<StopCircle className="mr-2" />
 						Stop Recording...
 					</h2>
 				) : (
@@ -87,7 +171,6 @@ function RecordAnswerSection() {
 				)}
 			</Button>
 
-			<Button onClick={() => console.log(userAnswer)}>Show User Answer</Button>
 		</div>
 	);
 }
