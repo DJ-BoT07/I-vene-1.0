@@ -39,7 +39,7 @@ function StartInterview({ params }) {
 	};
 
 	return (
-		<div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start gap-10">
+		<div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
 			<div className="w-full max-w-lg">
 				<QuestionsSection
 					mockInterviewQuestion={mockInterviewQuestion}

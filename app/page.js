@@ -1,4 +1,5 @@
 "use client"
+import { Hero } from "@/components/component/hero";
 import { Button } from "@/components/ui/button";
 import { UserButton } from "@clerk/nextjs";
 import Image from "next/image";
@@ -14,6 +15,7 @@ export default function Home() {
         
 	}, []);
   return (
+	<>
     <div>
   		<div className="flex p-4 items-center justify-between bg-secondary shadow-sm">
 			<Image src={"/logo.svg"} alt="logo" width={50} height={60} />
@@ -51,5 +53,7 @@ export default function Home() {
 			<UserButton />
 		</div>
     </div>
+	<Hero/>
+	</>
   );
 }
