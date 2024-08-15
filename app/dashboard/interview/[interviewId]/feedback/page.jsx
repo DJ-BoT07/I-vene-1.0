@@ -44,7 +44,7 @@ function Feedback({ params }) {
 			<h2 className="text-3xl font-bold text-green-500">Congratulations!</h2>
 			<h2 className="font-bold text-2xl">Here is your Interview Feedback</h2>
 			<h2 className="text-lg my-3 text-blue-600">
-				Your Overall Rating : <strong>{Math.round(averageRating * 10) / 10}/10</strong>
+				Your Overall Rating : <strong>{Math.round(averageRating * 10) / 10}/5</strong>
 			</h2>
 
 			<h2>
