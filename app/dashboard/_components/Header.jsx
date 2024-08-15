@@ -8,7 +8,7 @@ function Header() {
 	const path = usePathname();
 	useEffect(() => {
 		console.log(path);
-        console.log(process.env.NEXT_PUBLIC_DRIZZLE_DB_URL);
+        // console.log(process.env.NEXT_PUBLIC_DRIZZLE_DB_URL);
         
 	}, []);
 

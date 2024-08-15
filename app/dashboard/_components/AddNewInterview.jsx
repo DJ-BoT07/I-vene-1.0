@@ -18,6 +18,7 @@ import { db } from "@/utils/db";
 import { MockInterview } from "@/utils/schema";
 import { useUser } from "@clerk/nextjs";
 import moment from "moment/moment";
+import { useRouter } from "next/navigation";
 
 function AddNewInterview() {
 	const [openDialog, setOpenDialog] = useState(false);
@@ -26,6 +27,7 @@ function AddNewInterview() {
 	const [jobExperience, setJobExperience] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [jsonResponse, setJsonResponse] = useState([]);
+	const router = useRouter();
 	const { user } = useUser();
 
 	const onSubmit = async (e) => {
@@ -87,6 +89,10 @@ function AddNewInterview() {
 					.returning({ mockId: MockInterview.mockId });
 
 				console.log("Inserted Mock Interview:", resp);
+				if(resp) {
+					setOpenDialog(false);
+					router.push(`/dashboard/interview/`+resp[0]?.mockId);
+				}
 			} else {
 				console.log("ERROR: Failed to insert Mock Interview");
 			}
@@ -162,7 +168,8 @@ function AddNewInterview() {
 									<Button type="submit" disabled={loading}>
 										{loading ? (
 											<>
-												<LoaderCircle className="animate-spin" /> Generating from AI
+												<LoaderCircle className="animate-spin" /> Generating
+												from AI
 											</>
 										) : (
 											"Start Interview"
