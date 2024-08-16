@@ -21,7 +21,10 @@ function RecordAnswerSection({
 	const [userAnswer, setUserAnswer] = useState("");
 	const { user } = useUser();
 	const [loading, setLoading] = useState(false);
+
 	const {
+		error,
+		interimResult,
 		isRecording,
 		results,
 		setResults,
@@ -87,23 +90,21 @@ function RecordAnswerSection({
 
 			console.log("mockIdRef", interviewData.mockId);
 
-			// Ensure `db.insert` is used correctly with the new table name
 			const resp = await db
-			.insert(answersOfUser)
-			.values({
-			  mockIdRef: interviewData.mockId, // Using mockIdRef as defined in schema
-			  question: mockInterviewQuestion[activeQuestionIndex]?.Question,
-			  correctAns: mockInterviewQuestion[activeQuestionIndex]?.Answer,
-			  userAns: userAnswer,
-			  feedback: parsedResponse?.feedback,
-			  rating: parsedResponse?.rating,
-			  userEmail: user.primaryEmailAddress?.emailAddress,
-			  createdAt: moment().format("DD-MM-YYYY"),
-			})
-			.returning({ id: answersOfUser.mockIdRef });
-		  
+				.insert(answersOfUser)
+				.values({
+					mockIdRef: interviewData.mockId, 
+					question: mockInterviewQuestion[activeQuestionIndex]?.Question,
+					correctAns: mockInterviewQuestion[activeQuestionIndex]?.Answer,
+					userAns: userAnswer,
+					feedback: parsedResponse?.feedback,
+					rating: parsedResponse?.rating,
+					userEmail: user.primaryEmailAddress?.emailAddress,
+					createdAt: moment().format("DD-MM-YYYY"),
+				})
+				.returning({ id: answersOfUser.mockIdRef });
 
-			console.log("Insert Response:", resp); // Log the response to check success
+			console.log("Insert Response:", resp);
 
 			if (resp) {
 				toast.success("Answer saved successfully");
@@ -135,6 +136,8 @@ function RecordAnswerSection({
 		setHasWebcamError(true);
 		setIsWebcamActive(false);
 	};
+
+	if (error) return <p>Web Speech API is not available in this browser 🤷‍</p>;
 
 	return (
 		<div className="flex items-center justify-center flex-col">
@@ -171,6 +174,19 @@ function RecordAnswerSection({
 				)}
 			</Button>
 
+			{/* Display the transcribed text below the camera in real-time */}
+			{userAnswer && (
+				<div className="mt-5 p-4 bg-gray-100 rounded-lg w-full max-w-lg">
+					<h2 className="text-md font-semibold">Your Answer:</h2>
+					<p className="text-sm text-gray-700 mt-2">{userAnswer}</p>
+				</div>
+			)}
+			{/* Display interim results */}
+			{interimResult && (
+				<div className="mt-2 p-2 bg-yellow-100 rounded-lg w-full max-w-lg">
+					<p className="text-sm text-gray-800">{interimResult}</p>
+				</div>
+			)}
 		</div>
 	);
 }

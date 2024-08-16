@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { Lightbulb, Volume2 } from "lucide-react";
 
-function QuestionsSection({ mockInterviewQuestion, initialActiveQuestionIndex = 0 }) {
-  const [activeQuestionIndex, setActiveQuestionIndex] = useState(initialActiveQuestionIndex);
-
+function QuestionsSection({ mockInterviewQuestion, activeQuestionIndex, setActiveQuestionIndex }) {
   const textToSpeech = (text) => {
     if ('speechSynthesis' in window) {
       const speech = new SpeechSynthesisUtterance(text);
@@ -25,9 +23,9 @@ function QuestionsSection({ mockInterviewQuestion, initialActiveQuestionIndex = 
             <h2
               key={index}
               className={`p-5 bg-secondary rounded-lg text-xs md:text-sm text-center cursor-pointer ${
-                activeQuestionIndex === index ? 'bg-blue-300 font-bold' : ''
+                activeQuestionIndex === index ? 'bg-blue-400 font-bold' : ''
               }`}
-              onClick={() => setActiveQuestionIndex(index)} // Update the active question index on click
+              onClick={() => setActiveQuestionIndex(index)}
             >
               Question #{index + 1}
             </h2>
