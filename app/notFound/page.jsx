@@ -11,22 +11,29 @@ export default function NotFound() {
 
   const BLACKLISTED_KEY_CODES = [38, 40, 37, 39, 18, 20, 17, 16, 9, 27, 144];
   const COMMANDS = {
-    help: 'The page you want to visit does not exist, or it may have been deleted, or the wrong address was entered. To see the commands, enter the word <span class="text-[#fa615c]"> commands</span>',
+    help: 'The page you want to visit does not exist, or it may have been deleted, or the wrong address was entered. To see the commands, enter the word <span class="text-[#fa615c]">commands</span>',
     exit: '',
     report: '<span class="text-green-500">This page report has been successfully sent to support.</span>',
     commands: 'List of commands: <span class="text-[#fa615c]"> help</span> , <span class="text-[#fa615c]"> report</span> ,<span class="text-[#fa615c]"> exit</span>',
     cls: '',
+    dashboard: '',
+    question: ''
   };
 
   const executeCommand = (input) => {
     if (!input) return;
+    
+    console.log(`Received command: ${input}`); // Debugging line
+
     let output;
+    
     if (!COMMANDS.hasOwnProperty(input)) {
       output = `<p>The command entered is not correct</p>`;
     } else if (input === 'cls') {
       setTerminalOutput([]);
       return;
     } else if (input === 'close' || input === 'exit') {
+      console.log('Navigating to home'); // Debugging line
       router.push('/');
       return;
     } else if (input === 'report') {
@@ -36,6 +43,7 @@ export default function NotFound() {
       ]);
       return;
     } else if (input === 'dashboard') {
+      console.log('Navigating to dashboard'); // Debugging line
       router.push('/dashboard');
       return;
     } else if (input === 'question') {
@@ -44,6 +52,7 @@ export default function NotFound() {
     } else {
       output = COMMANDS[input];
     }
+
     setTerminalOutput((prev) => [
       ...prev,
       `<p class="out_code">${output}</p>`,
@@ -56,12 +65,26 @@ export default function NotFound() {
 
     const currentKey = event.key;
     if (currentKey === 'Enter') {
-      executeCommand(userInput);
+      console.log(`User input on Enter: ${userInput}`); // Debugging line
+      executeCommand(userInput.trim());
       setUserInput('');
     } else if (currentKey === 'Backspace') {
       setUserInput((prev) => prev.slice(0, -1));
     } else {
       setUserInput((prev) => prev + currentKey);
+    }
+  };
+
+  const handleButtonClick = (action) => {
+    if (action === 'min') {
+      setMinimized(true);
+      setMaximized(false);
+    } else if (action === 'max') {
+      setMaximized(true);
+      setMinimized(false);
+    } else if (action === 're') {
+      setMinimized(false);
+      setMaximized(false);
     }
   };
 
