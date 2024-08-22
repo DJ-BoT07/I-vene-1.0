@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
+import { Analytics } from "@vercel/analytics/react"; // Example import, adjust as needed
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,12 +14,13 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
-    <html lang="en">
-      <body className={inter.className}>
-        <Toaster/>
-        {children}
+      <html lang="en">
+        <body className={inter.className}>
+          <Toaster />
+          {children}
+          <Analytics debug={false}/> {/* Add Analytics here */}
         </body>
-    </html>
+      </html>
     </ClerkProvider>
   );
 }
