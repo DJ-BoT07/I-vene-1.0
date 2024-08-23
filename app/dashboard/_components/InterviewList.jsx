@@ -26,7 +26,7 @@ function InterviewList() {
 				)
 				.orderBy(desc(MockInterview.id));
 
-			console.log(result);
+			// console.log(result);
 			setInterviewList(result);
 		} catch (error) {
 			console.error("Error fetching interview list:", error);

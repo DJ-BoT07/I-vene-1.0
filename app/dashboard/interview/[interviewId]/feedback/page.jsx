@@ -28,7 +28,7 @@ function Feedback({ params }) {
 			.where(eq(answersOfUser.mockIdRef, params.interviewId))
 			.orderBy(answersOfUser.id);
 
-		console.log(result);
+		// console.log(result);
 		setFeedbackList(result);
 
 		// Calculate the average rating

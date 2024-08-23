@@ -50,7 +50,7 @@ function AddNewInterview() {
 			let MockJSONResp = await result.response.text();
 
 			// Log the entire response to inspect it
-			console.log("Raw Response:", MockJSONResp);
+			// console.log("Raw Response:", MockJSONResp);
 
 			// Remove markdown ticks and any extra characters
 			MockJSONResp = MockJSONResp.replace("```json", "")
@@ -65,7 +65,7 @@ function AddNewInterview() {
 			let parsedResponse;
 			try {
 				parsedResponse = JSON.parse(validJson);
-				console.log("Parsed JSON:", parsedResponse);
+				// console.log("Parsed JSON:", parsedResponse);
 			} catch (parseError) {
 				console.error("Failed to parse JSON:", parseError);
 				setLoading(false);
@@ -88,7 +88,7 @@ function AddNewInterview() {
 					})
 					.returning({ mockId: MockInterview.mockId });
 
-				console.log("Inserted Mock Interview:", resp);
+				// console.log("Inserted Mock Interview:", resp);
 				if(resp) {
 					setOpenDialog(false);
 					router.push(`/dashboard/interview/`+resp[0]?.mockId);

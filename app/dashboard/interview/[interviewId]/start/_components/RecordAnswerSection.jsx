@@ -69,7 +69,7 @@ function RecordAnswerSection({
 			const result = await chatSession.sendMessage(feedbackPrompt);
 			let MockJSONResp = await result.response.text();
 
-			console.log("Raw Response:", MockJSONResp);
+			// console.log("Raw Response:", MockJSONResp);
 
 			MockJSONResp = MockJSONResp.replace("```json", "")
 				.replace("```", "")
@@ -81,14 +81,14 @@ function RecordAnswerSection({
 			let parsedResponse;
 			try {
 				parsedResponse = JSON.parse(validJson);
-				console.log("Parsed JSON:", parsedResponse);
+				// console.log("Parsed JSON:", parsedResponse);
 			} catch (parseError) {
 				console.error("Failed to parse JSON:", parseError);
 				toast.error("Failed to parse feedback JSON.");
 				return;
 			}
 
-			console.log("mockIdRef", interviewData.mockId);
+			// console.log("mockIdRef", interviewData.mockId);
 
 			const resp = await db
 				.insert(answersOfUser)
@@ -104,7 +104,7 @@ function RecordAnswerSection({
 				})
 				.returning({ id: answersOfUser.mockIdRef });
 
-			console.log("Insert Response:", resp);
+			// console.log("Insert Response:", resp);
 
 			if (resp) {
 				toast.success("Answer saved successfully");
