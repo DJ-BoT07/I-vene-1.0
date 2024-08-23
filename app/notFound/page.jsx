@@ -60,7 +60,7 @@ export default function NotFound() {
     } else if (input === "home") {
       setTerminalOutput((prev) => [
         ...prev,
-        `<p>Navigating to Home....</p>`,
+        `<p>Navigating to Home.....</p>`,
       ]);
       setTimeout(() => {
         router.push("/");
