@@ -17,7 +17,11 @@ export default function Home() {
 		<>
 			<div>
 				<div className="flex p-4 items-center justify-between bg-secondary shadow-sm">
-					<Image src={"/logo.svg"} alt="logo" width={50} height={60} />
+					<Link
+						href={"/"}
+					>
+					<Image src={"/logo.svg"} alt="logo" width={50} height={60} className="cursor-pointer"/>
+					</Link>
 					<ul className="hidden md:flex gap-6">
 						<Link
 							href={"/"}
