@@ -3,6 +3,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/react"; // Example import, adjust as needed
+import Link from "next/link"; // Import Link from next/link
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,9 +16,14 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={inter.className}>
+        <body className={`${inter.className} min-h-screen flex flex-col`}>
           <Toaster />
-          {children}
+          <div className="flex-grow">
+            {children}
+          </div>
+          <footer className="text-center py-4">
+            &copy; {new Date().getFullYear()} Copyright by <Link href="mailto:djmangonkar@gmail.com">Digvijay Mangaonkar</Link>
+          </footer>
           <Analytics debug={false}/> {/* Add Analytics here */}
         </body>
       </html>
